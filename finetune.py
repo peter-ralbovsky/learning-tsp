@@ -19,6 +19,7 @@ from nets.attention_model import AttentionModel
 from nets.nar_model import NARModel
 from nets.encoders.gat_encoder import GraphAttentionEncoder
 from nets.encoders.gnn_encoder import GNNEncoder
+from nets.encoders.egnn_encoder import EGNNEncoder
 from nets.encoders.mlp_encoder import MLPEncoder
 
 from reinforce_baselines import *
@@ -206,6 +207,7 @@ if __name__ == "__main__":
     assert model_class is not None, "Unknown model: {}".format(model_class)
     encoder_class = {
         'gnn': GNNEncoder,
+        'egnn': EGNNEncoder,
         'gat': GraphAttentionEncoder,
         'mlp': MLPEncoder
     }.get(args.get('encoder', 'gnn'), None)

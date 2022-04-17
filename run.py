@@ -17,6 +17,7 @@ from nets.nar_model import NARModel
 from nets.critic_network import CriticNetwork
 from nets.encoders.gat_encoder import GraphAttentionEncoder
 from nets.encoders.gnn_encoder import GNNEncoder
+from nets.encoders.egnn_encoder import EGNNEncoder
 from nets.encoders.mlp_encoder import MLPEncoder
 
 from reinforce_baselines import NoBaseline, ExponentialBaseline, CriticBaseline, RolloutBaseline, WarmupBaseline
@@ -79,6 +80,7 @@ def _run_rl(opts):
     assert model_class is not None, "Unknown model: {}".format(model_class)
     encoder_class = {
         'gnn': GNNEncoder,
+        'egnn': EGNNEncoder,
         'gat': GraphAttentionEncoder,
         'mlp': MLPEncoder
     }.get(opts.encoder, None)
@@ -260,6 +262,7 @@ def _run_sl(opts):
     assert model_class is not None, "Unknown model: {}".format(model_class)
     encoder_class = {
         'gnn': GNNEncoder,
+        'egnn': EGNNEncoder,
         'gat': GraphAttentionEncoder,
         'mlp': MLPEncoder
     }.get(opts.encoder, None)
