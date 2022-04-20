@@ -72,7 +72,8 @@ class NARModel(nn.Module):
                                            norm=normalization, 
                                            learn_norm=learn_norm,
                                            track_norm=track_norm,
-                                           gated=gated)
+                                           gated=gated,
+                                           hidden_points=kwargs["hidden_points"])
         
         # Edge prediction layer
         self.project_node_emb = nn.Linear(embedding_dim, embedding_dim, bias=True)
@@ -132,9 +133,10 @@ class NARModel(nn.Module):
             log_p: Log-Softmax over final dimension of `logits` (B x V x V)
         """
         batch_size, num_nodes, _ = nodes.shape
-        
+        torch.autograd.set_detect_anomaly(True)
         # Compute node embeddings
-        embeddings = self.embedder(self._init_embed(nodes), graph)
+
+        embeddings = self.embedder(self._init_embed(nodes), graph, x=nodes)
         
         # Compute edge embeddings (B x V x V x H)
         Ux = self.project_node_emb(embeddings)

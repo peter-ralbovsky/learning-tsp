@@ -15,7 +15,9 @@ def get_edge_features(x):
 
 def get_pairwise_dists(x):
     f, t = get_edge_features(x)
-    return torch.sqrt(torch.sum((f-t)**2, dim=-1, keepdim=True))
+    ans = torch.sqrt(torch.sum(1e-8+(f-t)**2, dim=-1, keepdim=False)) #tofix
+
+    return ans
 
 
 
@@ -34,7 +36,7 @@ class EGNNLayer(nn.Module):
         - V. P. Dwivedi, C. K. Joshi, T. Laurent, Y. Bengio, and X. Bresson. Benchmarking graph neural networks. arXiv preprint arXiv:2003.00982, 2020.
     """
 
-    def __init__(self, hidden_dim, aggregation="sum", norm="batch", learn_norm=True, track_norm=False, gated=True):
+    def __init__(self, hidden_dim, aggregation="sum", norm="batch", learn_norm=True, track_norm=False, gated=True, hidden_points=1):
         """
         Args:
             hidden_dim: Hidden dimension size (int)
@@ -51,6 +53,7 @@ class EGNNLayer(nn.Module):
         self.learn_norm = learn_norm
         self.track_norm = track_norm
         self.gated = gated
+        self.hidden_points = hidden_points
         assert self.gated, "Use gating with GCN, pass the `--gated` flag"
         
         self.U = nn.Linear(hidden_dim, hidden_dim, bias=True)
@@ -58,9 +61,10 @@ class EGNNLayer(nn.Module):
         self.A = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.B = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.C = nn.Linear(hidden_dim, hidden_dim, bias=True)
-        self.c = nn.Parameter(torch.Tensor(1))
-        self.d = nn.Linear(1,hidden_dim)
-        self.e = nn.Linear(hidden_dim, 1)
+        self.D = nn.Linear(hidden_points, hidden_points, bias=True)
+        #self.c = nn.Parameter(torch.Tensor(hidden_points)) replaced by D
+        self.d = nn.Linear(hidden_points,hidden_dim, bias=True)
+        self.e = nn.Linear(hidden_dim, hidden_points, bias=True)
 
         self.norm_h = {
             "layer": nn.LayerNorm(hidden_dim, elementwise_affine=learn_norm),
@@ -77,7 +81,7 @@ class EGNNLayer(nn.Module):
         Args:
             h: Input node features (B x V x H)
             e: Input edge features (B x V x V x H)
-            x: Input node coordinates (B x V x 2)
+            x: Input node coordinates (B x V x hp x 2)
             graph: Graph adjacency matrices (B x V x V)
         Returns: 
             Updated node and edge features
@@ -96,17 +100,15 @@ class EGNNLayer(nn.Module):
         Bh = self.B(h)  # B x V x H
         Ce = self.C(e)  # B x V x V x H
 
-        distances = get_pairwise_dists(x_in)
+        distances = get_pairwise_dists(x_in) #B x V x hp
 
         # Update edge features and compute edge gates
         e = Ah.unsqueeze(1) + Bh.unsqueeze(2) + Ce + self.d(distances)  # B x V x V x H
         gates = torch.sigmoid(e)  # B x V x V x H
 
         x_from, x_to = get_edge_features(x_in)
-
-
         point_attention = torch.sigmoid(self.e(e))
-        x = self.c*torch.sum(point_attention * (x_to - x_from), dim = -2)
+        x = torch.sum(point_attention.unsqueeze(4) * (x_to - x_from), dim = -3)
 
 
 
@@ -128,10 +130,13 @@ class EGNNLayer(nn.Module):
         h = F.relu(h)
         e = F.relu(e)
 
+
+        Dx = torch.cat([self.D(x[:,:,:,0]).unsqueeze(3),self.D(x[:,:,:,1]).unsqueeze(3)], dim=3)
+
         # Make residual connection
         h = h_in + h
         e = e_in + e
-        x = x_in + x
+        x = x_in + Dx
 
         return h, e, x
 
@@ -165,17 +170,17 @@ class EGNNEncoder(nn.Module):
     """
     
     def __init__(self, n_layers, hidden_dim, aggregation="sum", norm="layer", 
-                 learn_norm=True, track_norm=False, gated=True, *args, **kwargs):
+                 learn_norm=True, track_norm=False, gated=True, hidden_points=1, *args, **kwargs):
         super(EGNNEncoder, self).__init__()
 
         self.init_embed_edges = nn.Embedding(2, hidden_dim)
-
+        self.hidden_points = hidden_points
         self.layers = nn.ModuleList([
-            EGNNLayer(hidden_dim, aggregation, norm, learn_norm, track_norm, gated)
+            EGNNLayer(hidden_dim, aggregation, norm, learn_norm, track_norm, gated, hidden_points)
                 for _ in range(n_layers)
         ])
 
-    def forward(self, x, graph):
+    def forward(self, h, graph, x):
         """
         Args:
             x: Input node features (B x V x H)
@@ -185,7 +190,7 @@ class EGNNEncoder(nn.Module):
         """
         # Embed edge features
         e = self.init_embed_edges(graph.type(torch.long))
-        h = x
+        x = x.unsqueeze(2).expand(-1,-1,self.hidden_points, -1)
         for layer in self.layers:
             h, e, x = layer(h, e, x, graph)
 

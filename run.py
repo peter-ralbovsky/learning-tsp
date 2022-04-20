@@ -102,7 +102,8 @@ def _run_rl(opts):
         mask_logits=True,
         mask_graph=False,
         checkpoint_encoder=opts.checkpoint_encoder,
-        shrink_size=opts.shrink_size
+        shrink_size=opts.shrink_size,
+        hidden_points=opts.num_coordinates,
     ).to(opts.device)
 
     if opts.use_cuda and torch.cuda.device_count() > 1:
@@ -284,7 +285,8 @@ def _run_sl(opts):
         mask_logits=True,
         mask_graph=False,
         checkpoint_encoder=opts.checkpoint_encoder,
-        shrink_size=opts.shrink_size
+        shrink_size=opts.shrink_size,
+        hidden_points=opts.num_coordinates
     ).to(opts.device)
 
     if opts.use_cuda and torch.cuda.device_count() > 1:

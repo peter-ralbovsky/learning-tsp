@@ -61,7 +61,7 @@ class MLPEncoder(nn.Module):
             MLPLayer(hidden_dim, norm, learn_norm, track_norm) for _ in range(n_layers)
         )
 
-    def forward(self, x, graph=None):
+    def forward(self, x, graph=None, *args,**kwargs):
         """
         Args:
             input: Input node features (B x V x H)

@@ -36,7 +36,7 @@ def get_options(args=None):
                         help='Number of instances used for reporting validation performance')
     parser.add_argument('--rollout_size', type=int, default=10000, 
                         help='Number of instances used for updating rollout baseline')
-    
+
     # Model/GNN Encoder
     parser.add_argument('--model', default='attention', 
                         help="Model: 'attention'/'nar'")
@@ -64,6 +64,8 @@ def get_options(args=None):
                         help="Number of attention heads")
     parser.add_argument('--tanh_clipping', type=float, default=10., 
                         help='Clip the parameters to within +- this value using tanh. Set to 0 to not do clipping.')
+    parser.add_argument('--num_coordinates', type=int, default=1,
+                        help='Number of coordinates in equivariant layers')
 
     # Training
     parser.add_argument('--lr_model', type=float, default=1e-4, 
@@ -132,5 +134,6 @@ def get_options(args=None):
     if opts.bl_warmup_epochs is None:
         opts.bl_warmup_epochs = 1 if opts.baseline == 'rollout' else 0
     assert (opts.bl_warmup_epochs == 0) or (opts.baseline == 'rollout')
+
     
     return opts

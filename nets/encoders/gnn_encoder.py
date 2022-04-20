@@ -53,7 +53,7 @@ class GNNLayer(nn.Module):
             "batch": nn.BatchNorm1d(hidden_dim, affine=learn_norm, track_running_stats=track_norm)
         }.get(self.norm, None)
         
-    def forward(self, h, e, graph):
+    def forward(self, h, e, graph, *args,**kwargs):
         """
         Args:
             h: Input node features (B x V x H)

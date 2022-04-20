@@ -11,7 +11,9 @@ class CriticNetwork(nn.Module):
                  learn_norm=True,
                  track_norm=False,
                  gated=True,
-                 n_heads=8):
+                 n_heads=8,
+                 *args,
+                 **kwargs):
         """Critic model for enabling RL training with critic baseline
 
         References:
@@ -31,7 +33,8 @@ class CriticNetwork(nn.Module):
                                           norm=normalization, 
                                           learn_norm=learn_norm,
                                           track_norm=track_norm,
-                                          gated=gated)
+                                          gated=gated,
+                                          hidden_points=kwargs["hidden_points"])
 
         self.value_head = nn.Sequential(
             nn.Linear(embedding_dim, embedding_dim),
@@ -40,5 +43,5 @@ class CriticNetwork(nn.Module):
         )
 
     def forward(self, inputs, graph):
-        graph_embeddings = self.encoder(self.init_embed(inputs), graph).mean(1)
+        graph_embeddings = self.encoder(self.init_embed(inputs), graph, x=inputs).mean(1)
         return self.value_head(graph_embeddings)

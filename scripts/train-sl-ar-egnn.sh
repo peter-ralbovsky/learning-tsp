@@ -12,7 +12,7 @@ MAX_SIZE=50
 NEIGHBORS=0.2
 KNN_STRAT="percentage"
 
-TRAIN_DATASET="data/tsp/tsp20-50_train_concorde.txt"
+TRAIN_DATASET="data/tsp/tsp20_train_concorde.txt"
 VAL_DATASET1="data/tsp/tsp20_test_concorde.txt"
 VAL_DATASET2="data/tsp/tsp50_test_concorde.txt"
 # VAL_DATASET3="data/tsp/tsp100_test_concorde.txt"

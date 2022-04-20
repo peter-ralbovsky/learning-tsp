@@ -150,6 +150,8 @@ if __name__ == "__main__":
                         help='Log info every log_step steps')
     parser.add_argument('--val_every', type=int, default=1, 
                         help='Validate every val_every epochs')
+    parser.add_argument('--num_coordinates', type=int, default=1,
+                        help='Number of coordinates in equivariant encoder')
     
     opts = parser.parse_args()
     opts.use_cuda = torch.cuda.is_available() and not opts.no_cuda
@@ -229,7 +231,8 @@ if __name__ == "__main__":
         mask_logits=True,
         mask_graph=False,
         checkpoint_encoder=args['checkpoint_encoder'],
-        shrink_size=args['shrink_size']
+        shrink_size=args['shrink_size'],
+        num_points=args['num_coordinates']
     ).to(opts.device)
 
     # Compute number of network parameters

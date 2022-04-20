@@ -16,7 +16,7 @@ class SkipConnection(nn.Module):
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, n_heads, input_dim, embed_dim=None, val_dim=None, key_dim=None):
+    def __init__(self, n_heads, input_dim, embed_dim, val_dim=None, key_dim=None):
         super(MultiHeadAttention, self).__init__()
 
         if val_dim is None:
@@ -40,6 +40,7 @@ class MultiHeadAttention(nn.Module):
 
         if embed_dim is not None:
             self.W_out = nn.Parameter(torch.Tensor(n_heads, key_dim, embed_dim))
+        # Here should be val_dim instead of key_dim?
 
         self.init_parameters()
 
@@ -48,7 +49,7 @@ class MultiHeadAttention(nn.Module):
             stdv = 1. / math.sqrt(param.size(-1))
             param.data.uniform_(-stdv, stdv)
 
-    def forward(self, q, h=None, mask=None):
+    def forward(self, q, h=None, mask=None, *args,**kwargs):
         """
         :param q: queries (batch_size, n_query, input_dim)
         :param h: data (batch_size, graph_size, input_dim)
@@ -187,7 +188,7 @@ class GraphAttentionEncoder(nn.Module):
                 for _ in range(n_layers)
         ])
 
-    def forward(self, x, graph):
+    def forward(self, x, graph, *args,**kwargs):
         for layer in self.layers:
             x = layer(x, graph)
         return x

@@ -156,7 +156,8 @@ class AttentionModel(nn.Module):
                                            norm=normalization, 
                                            learn_norm=learn_norm,
                                            track_norm=track_norm,
-                                           gated=gated)
+                                           gated=gated,
+                                           hidden_points=kwargs["hidden_points"])
 
         # For each node we compute (glimpse key, glimpse value, logit key) so 3 * embedding_dim
         self.project_node_embeddings = nn.Linear(embedding_dim, 3 * embedding_dim, bias=False)
@@ -183,10 +184,11 @@ class AttentionModel(nn.Module):
                         may be of different lengths on different GPUs)
         """
         # Embed input batch of graph using GNN (B x V x H)
+
         if self.checkpoint_encoder:
-            embeddings = checkpoint(self.embedder, self._init_embed(nodes), graph)
+            embeddings = checkpoint(self.embedder, self._init_embed(nodes), graph, x=nodes)
         else:
-            embeddings = self.embedder(self._init_embed(nodes), graph)
+            embeddings = self.embedder(self._init_embed(nodes), graph, x=nodes)
         
         if self.extra_logging:
             self.embeddings_batch = embeddings
