@@ -43,5 +43,5 @@ class CriticNetwork(nn.Module):
         )
 
     def forward(self, inputs, graph):
-        graph_embeddings = self.encoder(self.init_embed(inputs), graph, x=inputs).mean(1)
+        graph_embeddings = self.encoder(self.init_embed(inputs), graph, pos=inputs).mean(1)
         return self.value_head(graph_embeddings)

@@ -186,9 +186,9 @@ class AttentionModel(nn.Module):
         # Embed input batch of graph using GNN (B x V x H)
 
         if self.checkpoint_encoder:
-            embeddings = checkpoint(self.embedder, self._init_embed(nodes), graph, x=nodes)
+            embeddings = checkpoint(self.embedder, self._init_embed(nodes), graph, pos=nodes)
         else:
-            embeddings = self.embedder(self._init_embed(nodes), graph, x=nodes)
+            embeddings = self.embedder(self._init_embed(nodes), graph, pos=nodes)
         
         if self.extra_logging:
             self.embeddings_batch = embeddings

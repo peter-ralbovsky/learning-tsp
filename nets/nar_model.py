@@ -136,7 +136,7 @@ class NARModel(nn.Module):
         torch.autograd.set_detect_anomaly(True)
         # Compute node embeddings
 
-        embeddings = self.embedder(self._init_embed(nodes), graph, x=nodes)
+        embeddings = self.embedder(self._init_embed(nodes), graph, pos=nodes)
         
         # Compute edge embeddings (B x V x V x H)
         Ux = self.project_node_emb(embeddings)

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-RUN_NAME="rl-ar-var-20pnn-gnn-max"
+RUN_NAME="rl-ar-var-20pnn-egnn-max"
 
 PROBLEM="tsp"
 

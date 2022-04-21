@@ -142,7 +142,7 @@ class GNNEncoder(nn.Module):
                 for _ in range(n_layers)
         ])
 
-    def forward(self, x, graph):
+    def forward(self, x, graph, *args, **kwargs):
         """
         Args:
             x: Input node features (B x V x H)
