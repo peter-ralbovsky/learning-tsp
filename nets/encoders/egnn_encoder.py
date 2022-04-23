@@ -108,7 +108,8 @@ class EGNNLayer(nn.Module):
         gates = torch.sigmoid(e)  # B x V x V x H
 
         x_from, x_to = get_edge_features(x_in)
-        point_attention = torch.sigmoid(self.e(e))
+        point_attention = torch.sigmoid(self.e(e)).clone() # B x V x V x H
+        point_attention[graph.unsqueeze(-1).expand_as(point_attention)] = 0 # added gating
         x = torch.sum(point_attention.unsqueeze(4) * (x_to - x_from), dim = -3)
 
 
