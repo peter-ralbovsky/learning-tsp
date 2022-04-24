@@ -57,13 +57,11 @@ def _run_rl(opts):
         tb_logger = TbLogger(os.path.join(
             opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
         if not opts.no_wandb:
-            wandb.tensorboard.patch(root_logdir=os.path.join(
-                opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
             c_l = tb_logger.log_value
 
             def log(name, value, step=None):
-                wandb.log({name: value}, step)
-                c_l(name, value, step)
+                wandb.log({name: value}, step=step)
+                c_l(name, value, step=step)
 
             tb_logger.log_value = log
 
@@ -250,13 +248,11 @@ def _run_sl(opts):
         tb_logger = TbLogger(os.path.join(
             opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
         if not opts.no_wandb:
-            wandb.tensorboard.patch(root_logdir=os.path.join(
-                opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
             c_l = tb_logger.log_value
 
             def log(name, value, step=None):
-                wandb.log({name: value}, step)
-                c_l(name, value, step)
+                wandb.log({name: value}, step=step)
+                c_l(name, value, step=step)
 
             tb_logger.log_value = log
 
