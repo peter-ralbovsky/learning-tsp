@@ -61,7 +61,7 @@ class EGNNLayer(nn.Module):
         self.A = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.B = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.C = nn.Linear(hidden_dim, hidden_dim, bias=True)
-        self.D = nn.Linear(num_coordinates, num_coordinates, bias=True)
+        self.D = nn.Linear(num_coordinates, num_coordinates, bias=False)
         #self.c = nn.Parameter(torch.Tensor(num_coordinates)) replaced by D
         self.d = nn.Linear(num_coordinates,hidden_dim, bias=True)
         self.e = nn.Linear(hidden_dim, num_coordinates, bias=True)
