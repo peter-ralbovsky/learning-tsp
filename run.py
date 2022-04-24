@@ -23,14 +23,19 @@ from nets.encoders.mlp_encoder import MLPEncoder
 from reinforce_baselines import NoBaseline, ExponentialBaseline, CriticBaseline, RolloutBaseline, WarmupBaseline
 
 from utils import torch_load_cpu, load_problem
+import os
+
 
 import warnings
 warnings.filterwarnings("ignore", message="indexing with dtype torch.uint8 is now deprecated, please use a dtype torch.bool instead.")
-
+import wandb
 
 def run(opts):
     """Top level method to run experiments for SL and RL
     """
+    if not opts.no_wandb:
+        os.environ["WANDB_API_KEY"] = "f00483aa8810dc69a4f66d8fa297ec88bbb2d723"
+        wandb.init(project='learning-tsp', config=opts)
     if opts.problem == 'tspsl':
         _run_sl(opts)
     else:
@@ -51,6 +56,17 @@ def _run_rl(opts):
     if not opts.no_tensorboard:
         tb_logger = TbLogger(os.path.join(
             opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
+        if not opts.no_wandb:
+            wandb.tensorboard.patch(root_logdir=os.path.join(
+                opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
+            c_l = tb_logger.log_value
+
+            def log(name, value, step=None):
+                wandb.log({name: value}, step)
+                c_l(name, value, step)
+
+            tb_logger.log_value = log
+
 
     os.makedirs(opts.save_dir)
     # Save arguments so exact configuration can always be found
@@ -233,6 +249,16 @@ def _run_sl(opts):
     if not opts.no_tensorboard:
         tb_logger = TbLogger(os.path.join(
             opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
+        if not opts.no_wandb:
+            wandb.tensorboard.patch(root_logdir=os.path.join(
+                opts.log_dir, "{}_{}-{}".format(opts.problem, opts.min_size, opts.max_size), opts.run_name))
+            c_l = tb_logger.log_value
+
+            def log(name, value, step=None):
+                wandb.log({name: value}, step)
+                c_l(name, value, step)
+
+            tb_logger.log_value = log
 
     os.makedirs(opts.save_dir)
     # Save arguments so exact configuration can always be found

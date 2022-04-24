@@ -13,6 +13,7 @@ from torch.nn import DataParallel
 from utils.log_utils import log_values, log_values_sl
 from utils.data_utils import BatchedRandomSampler
 from utils import move_to
+import wandb
 
 
 def get_inner_model(model):
@@ -140,6 +141,8 @@ def train_epoch(model, optimizer, baseline, lr_scheduler, epoch, val_datasets, p
             },
             os.path.join(opts.save_dir, 'epoch-{}.pt'.format(epoch))
         )
+        if not opts.no_wandb:
+            wandb.save(os.path.join(opts.save_dir, 'epoch-{}.pt'.format(epoch)))
 
     for val_idx, val_dataset in enumerate(val_datasets):
         avg_reward, avg_opt_gap = validate(model, val_dataset, problem, opts)
@@ -238,6 +241,8 @@ def train_epoch_sl(model, optimizer, lr_scheduler, epoch, train_dataset, val_dat
             },
             os.path.join(opts.save_dir, 'epoch-{}.pt'.format(epoch))
         )
+        if not opts.no_wandb:
+            wandb.save(os.path.join(opts.save_dir, 'epoch-{}.pt'.format(epoch)))
 
     for val_idx, val_dataset in enumerate(val_datasets):
         avg_reward, avg_opt_gap = validate(model, val_dataset, problem, opts)

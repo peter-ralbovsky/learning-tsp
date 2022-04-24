@@ -121,6 +121,9 @@ def get_options(args=None):
                         help='Disable progress bar')
     parser.add_argument('--no_cuda', action='store_true', 
                         help='Disable CUDA')
+    parser.add_argument('--no_wandb', action='store_true',
+                        help='Disable wandb')
+
 
     opts = parser.parse_args(args)
 
