@@ -36,7 +36,7 @@ class EGNNLayer(nn.Module):
         - V. P. Dwivedi, C. K. Joshi, T. Laurent, Y. Bengio, and X. Bresson. Benchmarking graph neural networks. arXiv preprint arXiv:2003.00982, 2020.
     """
 
-    def __init__(self, hidden_dim, aggregation="sum", norm="batch", learn_norm=True, track_norm=False, gated=True, hidden_points=1):
+    def __init__(self, hidden_dim, aggregation="sum", norm="batch", learn_norm=True, track_norm=False, gated=True, num_coordinates=1):
         """
         Args:
             hidden_dim: Hidden dimension size (int)
@@ -53,7 +53,7 @@ class EGNNLayer(nn.Module):
         self.learn_norm = learn_norm
         self.track_norm = track_norm
         self.gated = gated
-        self.hidden_points = hidden_points
+        self.num_coordinates = num_coordinates
         assert self.gated, "Use gating with GCN, pass the `--gated` flag"
         
         self.U = nn.Linear(hidden_dim, hidden_dim, bias=True)
@@ -61,10 +61,10 @@ class EGNNLayer(nn.Module):
         self.A = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.B = nn.Linear(hidden_dim, hidden_dim, bias=True)
         self.C = nn.Linear(hidden_dim, hidden_dim, bias=True)
-        self.D = nn.Linear(hidden_points, hidden_points, bias=True)
-        #self.c = nn.Parameter(torch.Tensor(hidden_points)) replaced by D
-        self.d = nn.Linear(hidden_points,hidden_dim, bias=True)
-        self.e = nn.Linear(hidden_dim, hidden_points, bias=True)
+        self.D = nn.Linear(num_coordinates, num_coordinates, bias=True)
+        #self.c = nn.Parameter(torch.Tensor(num_coordinates)) replaced by D
+        self.d = nn.Linear(num_coordinates,hidden_dim, bias=True)
+        self.e = nn.Linear(hidden_dim, num_coordinates, bias=True)
 
         self.norm_h = {
             "layer": nn.LayerNorm(hidden_dim, elementwise_affine=learn_norm),
@@ -172,13 +172,13 @@ class EGNNEncoder(nn.Module):
     """
     
     def __init__(self, n_layers, hidden_dim, aggregation="sum", norm="layer", 
-                 learn_norm=True, track_norm=False, gated=True, hidden_points=1, *args, **kwargs):
+                 learn_norm=True, track_norm=False, gated=True, num_coordinates=1, *args, **kwargs):
         super(EGNNEncoder, self).__init__()
 
         self.init_embed_edges = nn.Embedding(2, hidden_dim)
-        self.hidden_points = hidden_points
+        self.num_coordinates = num_coordinates
         self.layers = nn.ModuleList([
-            EGNNLayer(hidden_dim, aggregation, norm, learn_norm, track_norm, gated, hidden_points)
+            EGNNLayer(hidden_dim, aggregation, norm, learn_norm, track_norm, gated, num_coordinates)
                 for _ in range(n_layers)
         ])
 
@@ -193,7 +193,7 @@ class EGNNEncoder(nn.Module):
         # Embed edge features
         x = pos
         e = self.init_embed_edges(graph.type(torch.long))
-        x = x.unsqueeze(2).expand(-1,-1,self.hidden_points, -1)
+        x = x.unsqueeze(2).expand(-1,-1,self.num_coordinates, -1)
         for layer in self.layers:
             h, e, x = layer(h, e, x, graph)
 

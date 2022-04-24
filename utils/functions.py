@@ -142,7 +142,8 @@ def load_model(path, epoch=None, extra_logging=False):
         mask_graph=False,
         checkpoint_encoder=args['checkpoint_encoder'],
         shrink_size=args['shrink_size'],
-        extra_logging=extra_logging
+        extra_logging=extra_logging,
+        **args
     )    
     
     # Overwrite model parameters by parameters to load

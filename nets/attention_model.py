@@ -157,7 +157,7 @@ class AttentionModel(nn.Module):
                                            learn_norm=learn_norm,
                                            track_norm=track_norm,
                                            gated=gated,
-                                           hidden_points=kwargs["hidden_points"])
+                                           num_coordinates=kwargs["num_coordinates"])
 
         # For each node we compute (glimpse key, glimpse value, logit key) so 3 * embedding_dim
         self.project_node_embeddings = nn.Linear(embedding_dim, 3 * embedding_dim, bias=False)

@@ -34,7 +34,7 @@ class CriticNetwork(nn.Module):
                                           learn_norm=learn_norm,
                                           track_norm=track_norm,
                                           gated=gated,
-                                          hidden_points=kwargs["hidden_points"])
+                                          num_coordinates=kwargs["num_coordinates"])
 
         self.value_head = nn.Sequential(
             nn.Linear(embedding_dim, embedding_dim),

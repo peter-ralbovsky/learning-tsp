@@ -73,7 +73,7 @@ class NARModel(nn.Module):
                                            learn_norm=learn_norm,
                                            track_norm=track_norm,
                                            gated=gated,
-                                           hidden_points=kwargs["hidden_points"])
+                                           num_coordinates=kwargs["num_coordinates"])
         
         # Edge prediction layer
         self.project_node_emb = nn.Linear(embedding_dim, embedding_dim, bias=True)
