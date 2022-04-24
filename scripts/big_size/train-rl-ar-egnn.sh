@@ -38,7 +38,7 @@ BASELINE="rollout"
 
 LR_MODEL=0.0001
 MAX_NORM=1
-CHECKPOINT_EPOCHS=0
+CHECKPOINT_EPOCHS=5
 
 CUDA_VISIBLE_DEVICES="$DEVICES" python run.py --problem "$PROBLEM" \
     --model "$MODEL" --baseline "$BASELINE" \
