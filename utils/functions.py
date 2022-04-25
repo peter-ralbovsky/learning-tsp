@@ -91,6 +91,7 @@ def load_model(path, epoch=None, extra_logging=False):
     from nets.encoders.gat_encoder import GraphAttentionEncoder
     from nets.encoders.gnn_encoder import GNNEncoder
     from nets.encoders.egnn_encoder import EGNNEncoder
+    from nets.encoders.gegnn_encoder import GEGNNEncoder
     from nets.encoders.mlp_encoder import MLPEncoder
     
     if os.path.isfile(path):
@@ -120,6 +121,7 @@ def load_model(path, epoch=None, extra_logging=False):
     encoder_class = {
         'gnn': GNNEncoder,
         'egnn': EGNNEncoder,
+        'gegnn': GEGNNEncoder,
         'gat': GraphAttentionEncoder,
         'mlp': MLPEncoder
     }.get(args.get('encoder', 'gnn'), None)

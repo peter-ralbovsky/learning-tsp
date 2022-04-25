@@ -20,6 +20,7 @@ from nets.nar_model import NARModel
 from nets.encoders.gat_encoder import GraphAttentionEncoder
 from nets.encoders.gnn_encoder import GNNEncoder
 from nets.encoders.egnn_encoder import EGNNEncoder
+from nets.encoders.gegnn_encoder import GEGNNEncoder
 from nets.encoders.mlp_encoder import MLPEncoder
 
 from reinforce_baselines import *
@@ -210,6 +211,7 @@ if __name__ == "__main__":
     encoder_class = {
         'gnn': GNNEncoder,
         'egnn': EGNNEncoder,
+        'gegnn': GEGNNEncoder,
         'gat': GraphAttentionEncoder,
         'mlp': MLPEncoder
     }.get(args.get('encoder', 'gnn'), None)
