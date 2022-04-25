@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-RUN_NAME="sl-ar-var-20pnn-gnn-max"
+if [ $# -eq 0 ]
+then
+  SEED=1234
+else
+  SEED=$1
+fi
+RUN_NAME="sl-ar-var-20pnn-gnn-max-$SEED"
 
 PROBLEM="tspsl"
 
@@ -54,4 +60,5 @@ CUDA_VISIBLE_DEVICES="$DEVICES" python run.py --problem "$PROBLEM" \
     --lr_model "$LR_MODEL" --max_grad_norm "$MAX_NORM" \
     --num_workers "$NUM_WORKERS" \
     --checkpoint_epochs "$CHECKPOINT_EPOCHS" \
+    --seed "$SEED" \
     --run_name "$RUN_NAME"
