@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 
-RUN_NAME="sl-ar-var-20pnn-gegnn-max"
+if [ $# -eq 0 ]
+then
+  SEED=1234
+else
+  SEED=$1
+fi
+RUN_NAME="sl-nar-var-20pnn-gegnn-max-$SEED"
 
 PROBLEM="tspsl"
 
@@ -25,13 +31,13 @@ ACCUMULATION_STEPS=1
 VAL_SIZE=1280
 ROLLOUT_SIZE=1280
 
-MODEL="attention"
+MODEL="nar"
 ENCODER="gegnn"
 AGGREGATION="max"
 AGGREGATION_GRAPH="mean"
 NORMALIZATION="batch"
 EMBEDDING_DIM=128
-N_ENCODE_LAYERS=3
+N_ENCODE_LAYERS=4
 
 LR_MODEL=0.0001
 MAX_NORM=1
@@ -54,4 +60,5 @@ CUDA_VISIBLE_DEVICES="$DEVICES" python run.py --problem "$PROBLEM" \
     --lr_model "$LR_MODEL" --max_grad_norm "$MAX_NORM" \
     --num_workers "$NUM_WORKERS" \
     --checkpoint_epochs "$CHECKPOINT_EPOCHS" \
+    --seed "$SEED" \
     --run_name "$RUN_NAME"
