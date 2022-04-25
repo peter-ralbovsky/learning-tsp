@@ -36,7 +36,7 @@ conda activate tsp
 
 
 #! Full path to application executable:
-CMD="/usr/bin/bash $1 $SLURM_ARRAY_TASK_ID"
+CMD="/usr/bin/bash "$@" $SLURM_ARRAY_TASK_ID"
 
 #! Run options for the application:
 

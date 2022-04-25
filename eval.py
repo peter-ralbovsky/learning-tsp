@@ -71,7 +71,10 @@ def eval_dataset(dataset_path, decode_strategy, width, softmax_temp, opts):
     latex_str = ' & ${:.3f}\pm{:.3f}$ & ${:.3f}\%\pm{:.3f}$ & ${:.3f}$s'.format(
         costs.mean(), np.std(costs), opt_gap.mean(), np.std(opt_gap), np.sum(durations)/opts.batch_size)
 
-    return latex_str
+    results_str = '{:.3f},{:.3f},{:.3f},{:.3f},{:.3f},'.format(
+        costs.mean(), np.std(costs), opt_gap.mean(), np.std(opt_gap), np.sum(durations) / opts.batch_size)
+
+    return latex_str, results_str, model_args
 
 
 def _eval_dataset(model, dataset, decode_strategy, width, softmax_temp, opts, device):
@@ -208,8 +211,26 @@ if __name__ == "__main__":
 
     for decode_strategy, width in zip(opts.decode_strategies, opts.widths):
         latex_str = "{}-{}{}".format(opts.model, decode_strategy, width if decode_strategy != 'greedy' else '')
+        #results_str = "{},{},{}{}".format(opts.model,
+                                          # "ar" if "-ar-" in opts.model else "nar",
+                                          # "rl" if "rl-" in opts.model else "sl",
+                                          # "gnn" if "-gnn-" in opts.model else ("egn"),
+                                          #
+                                          #
+                                          # decode_strategy, width if decode_strategy != 'greedy' else '')
+        results_str = ""
+        model_param = {}
         for dataset_path in opts.datasets:
-            latex_str += eval_dataset(dataset_path, decode_strategy, width, opts.softmax_temperature, opts)
-            
+            res = eval_dataset(dataset_path, decode_strategy, width, opts.softmax_temperature, opts)
+            latex_str += res[0]
+            results_str += res[1]
+            model_param = res[2]
+
+        results_str = "{},{},{},{},{},{},".format(opts.model, model_param['seed'], "ar" if "-ar-" in opts.model else "nar",
+                                           model_param['encoder'], model_param['problem'],model_param['num_coordinates'])\
+            + results_str
+
         with open("results/results_latex.txt", "a") as f:
             f.write(latex_str+"\n")
+        with open(os.path.join(opts.model,"results_table.csv"), "w") as f:
+            f.write(results_str+"\n")

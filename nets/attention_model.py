@@ -389,7 +389,7 @@ class AttentionModel(nn.Module):
             # Don't need embeddings as input to get_costs
             lambda input, pi: self.problem.get_costs(input[0], pi),  
             # Pack input with embeddings (additional input)
-            (input, graph, self.embedder(self._init_embed(input), graph)),
+            (input, graph, self.embedder(self._init_embed(input), graph, pos=input)),
             batch_rep, iter_rep
         )
 
